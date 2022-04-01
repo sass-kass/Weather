@@ -11,8 +11,11 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.weatherapp.R
 import com.example.weatherapp.service.dataclasses.fivedayweather.WeatherHourly
+import dagger.hilt.android.scopes.FragmentScoped
+import javax.inject.Inject
 
-class WeatherAdapter : ListAdapter<WeatherHourly, WeatherAdapter.ViewHolder>(WeatherComparator()) {
+@FragmentScoped
+class WeatherAdapter @Inject constructor() : ListAdapter<WeatherHourly, WeatherAdapter.ViewHolder>(WeatherComparator()) {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val icon: ImageView = view.findViewById(R.id.item_icon)

@@ -6,20 +6,27 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.weatherapp.databinding.FragmentFiveDayWeatherBinding
 import com.example.weatherapp.repository.WeatherRepository
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class FiveDayWeatherFragment : Fragment() {
     private var _binding: FragmentFiveDayWeatherBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var viewModel: FiveDayWeatherViewModel
+    private val viewModel: FiveDayWeatherViewModel by viewModels()
 
     private val args: FiveDayWeatherFragmentArgs by navArgs()
+
+    @Inject
+    lateinit var adapter: WeatherAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,22 +34,20 @@ class FiveDayWeatherFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentFiveDayWeatherBinding.inflate(inflater, container, false)
-        val view = binding.root
-        val dataSource = WeatherRepository()
-        val viewModelFactory = FiveDayWeatherViewModelFactory(dataSource, args.cityName)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(FiveDayWeatherViewModel::class.java)
-
-        val adapter = WeatherAdapter()
-        binding.fiveDayRecyclerview.adapter = adapter
         val divider = DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL)
         binding.fiveDayRecyclerview.addItemDecoration(divider)
+        viewModel.setCityName(args.cityName)
+        viewModel.cityName.observe(viewLifecycleOwner) {
+            viewModel.getWeather()
+        }
+        binding.fiveDayRecyclerview.adapter = adapter
         viewModel.currentWeather.observe(viewLifecycleOwner) { weather ->
             weather.let {
                 adapter.submitList(weather.list)
                 binding.cityLabel.text = weather.city.name
             }
         }
-        return view
+        return binding.root
     }
 
     override fun onResume() {

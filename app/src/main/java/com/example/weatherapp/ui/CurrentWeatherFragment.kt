@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import coil.load
@@ -11,15 +12,17 @@ import com.example.weatherapp.MainActivity
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.FragmentCurrentWeatherBinding
 import com.example.weatherapp.repository.WeatherRepository
+import dagger.hilt.android.AndroidEntryPoint
 
 
 private const val TAG = "MyActivity"
 
+@AndroidEntryPoint
 class CurrentWeatherFragment: Fragment() {
     private var _binding: FragmentCurrentWeatherBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var viewModel: CurrentWeatherViewModel
+    private val viewModel: CurrentWeatherViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,10 +30,6 @@ class CurrentWeatherFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentCurrentWeatherBinding.inflate(inflater, container, false)
-        val view = binding.root
-        val dataSource = WeatherRepository()
-        val viewModelFactory = CurrentWeatherViewModelFactory(dataSource)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(CurrentWeatherViewModel::class.java)
 
         binding.submitButton.setOnClickListener {
             viewModel.getNewWeather(binding.searchingField.text.toString())
@@ -76,7 +75,7 @@ class CurrentWeatherFragment: Fragment() {
                 binding.submitButton.isEnabled = true
             }
         }
-        return view
+        return binding.root
     }
 
     override fun onResume() {

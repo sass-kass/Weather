@@ -2,19 +2,28 @@ package com.example.weatherapp.service
 
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 
 private const val CONNECTION_TIMEOUT_MS: Long = 60
 private const val BASE_URL = "https://api.openweathermap.org/data/2.5/"
 
+@Module
+@InstallIn(SingletonComponent::class)
 object WebClient {
     private var retrofit: Retrofit? = null
 
+    @Provides
+    @Singleton
     fun getClient(): WeatherService {
         if (retrofit == null){
             retrofit = Retrofit.Builder()
